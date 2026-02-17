@@ -1,0 +1,65 @@
+# ============================================================
+# docker-compose: app (Laravel) + DB (MySQL) only (no nginx)
+# For nginx: use the two volume mounts in docker/nginx-volumes.txt
+# Build app: docker compose build app
+# Run all:   docker compose up -d
+# ============================================================
+
+services:
+  # ---- App container (built from Dockerfile) ----
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: taqeem-app
+    container_name: taqeem-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - taqeem-vendor:/var/www/vendor
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8080
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-taqeem}
+      - DB_USERNAME=${DB_USERNAME:-taqeem}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - taqeem
+
+  # ---- Database (MySQL 8) ----
+  db:
+    image: mysql:8.0
+    container_name: taqeem-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-taqeem}
+      MYSQL_USER: ${DB_USERNAME:-taqeem}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - taqeem-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "sh", "-c", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - taqeem
+
+volumes:
+  taqeem-vendor:
+  taqeem-mysql:
+
+networks:
+  taqeem:
+    driver: bridge

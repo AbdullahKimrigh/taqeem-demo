@@ -7,6 +7,33 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Running with Docker
+
+Requires Docker and Docker Compose.
+
+- **Dockerfile** — builds the **app** container only (Laravel + PHP 8.2-FPM).
+- **docker-compose** — runs **app** + **DB** (MySQL 8) + **nginx**.
+
+```bash
+# Optional: create .env (or it will be created from .env.example on first run)
+cp .env.example .env
+
+# Build the app image and start all services
+docker compose up -d --build
+
+# App is at http://localhost:8080
+```
+
+| Service | Description |
+|--------|-------------|
+| **app** | Laravel (PHP 8.2-FPM), built from Dockerfile. Migrations + seed run on startup. |
+| **db** | MySQL 8. Data in volume `taqeem-mysql`. |
+| **nginx** | Web server, forwards to app; exposes port **8080**. |
+
+Optional in `.env`: `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` (defaults: `taqeem` / `taqeem` / `secret`).
+
+Stop: `docker compose down`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

@@ -3,34 +3,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: taqeem-app
-    container_name: taqeem-app
     restart: unless-stopped
-    working_dir: /var/www
     volumes:
-      - .:/var/www
-      - taqeem-vendor:/var/www/vendor
-    environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - APP_URL=http://localhost:8080
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-taqeem}
-      - DB_USERNAME=${DB_USERNAME:-taqeem}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-    env_file:
-      - .env
+      - ./taqeem-demo:/taqeem-app
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - taqeem
+      - taqeem_network
   
   db:
     image: mysql:8.0
-    container_name: taqeem-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-taqeem}
@@ -45,12 +28,11 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - taqeem
+      - taqeem_network
 
 volumes:
-  taqeem-vendor:
   taqeem-mysql:
 
 networks:
-  taqeem:
+  taqeem_network:
     driver: bridge

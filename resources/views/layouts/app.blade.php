@@ -4,7 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', __('Vehicle Damage Estimation')) — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com"></script>
+    @endif
     <style>
         .badge-submitted { background: #e0e7ff; color: #3730a3; }
         .badge-ready { background: #d1fae5; color: #065f46; }

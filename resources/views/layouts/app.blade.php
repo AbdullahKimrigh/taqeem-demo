@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Vehicle Damage Estimation') — {{ config('app.name') }}</title>
+    <title>@yield('title', __('Vehicle Damage Estimation')) — {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .badge-submitted { background: #e0e7ff; color: #3730a3; }
@@ -17,11 +17,11 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen antialiased">
     <header class="bg-slate-800 text-white shadow">
         <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="font-semibold text-lg">Remote Vehicle Damage Estimation</a>
+            <a href="{{ route('home') }}" class="font-semibold text-lg">{{ __('Remote Vehicle Damage Estimation') }}</a>
             <nav class="flex gap-4 text-sm">
-                <a href="{{ route('home') }}" class="hover:underline">Home</a>
-                <a href="{{ route('customer.index') }}" class="hover:underline">Customer</a>
-                <a href="{{ route('evaluator.index') }}" class="hover:underline">Evaluator</a>
+                <a href="{{ route('home') }}" class="hover:underline">{{ __('Home') }}</a>
+                <a href="{{ route('customer.index') }}" class="hover:underline">{{ __('Customer') }}</a>
+                <a href="{{ route('evaluator.index') }}" class="hover:underline">{{ __('Evaluator') }}</a>
             </nav>
         </div>
     </header>
@@ -29,19 +29,19 @@
     <main class="max-w-5xl mx-auto px-4 py-8">
         @if(session('success'))
             <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-800 rounded">
-                {{ session('success') }}
+                {{ __(session('success')) }}
             </div>
         @endif
         @if(session('error'))
             <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-800 rounded">
-                {{ session('error') }}
+                {{ __(session('error')) }}
             </div>
         @endif
         @yield('content')
     </main>
 
     <footer class="max-w-5xl mx-auto px-4 py-4 text-slate-500 text-sm border-t mt-8">
-        Demo MVP — Accident Assessment Center. Not for production use.
+        {{ __('Demo MVP — Accident Assessment Center. Not for production use.') }}
     </footer>
 </body>
 </html>

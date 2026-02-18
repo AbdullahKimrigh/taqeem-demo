@@ -1,12 +1,4 @@
-# ============================================================
-# docker-compose: app (Laravel) + DB (MySQL) only (no nginx)
-# For nginx: use the two volume mounts in docker/nginx-volumes.txt
-# Build app: docker compose build app
-# Run all:   docker compose up -d
-# ============================================================
-
 services:
-  # ---- App container (built from Dockerfile) ----
   app:
     build:
       context: .
@@ -35,8 +27,7 @@ services:
         condition: service_healthy
     networks:
       - taqeem
-
-  # ---- Database (MySQL 8) ----
+  
   db:
     image: mysql:8.0
     container_name: taqeem-db

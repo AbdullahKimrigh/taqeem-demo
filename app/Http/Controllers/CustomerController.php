@@ -6,18 +6,63 @@ use App\Models\DamageCase;
 use App\Models\CaseImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class CustomerController extends Controller
 {
-    public function index(): View
+    /**
+     * Step 1: Select appointment (date + time slot).
+     */
+    public function appointment(): View
     {
-        return view('customer.form');
+        return view('customer.appointment');
     }
 
+    /**
+     * Store selected appointment in session and redirect to form (Step 2).
+     */
+    public function storeAppointment(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'appointment_date' => 'required|date|after_or_equal:today',
+            'appointment_slot' => 'required|string|max:50',
+        ]);
+
+        session([
+            'customer_appointment_date' => $request->appointment_date,
+            'customer_appointment_slot' => $request->appointment_slot,
+        ]);
+
+        return redirect()->route('customer.index')
+            ->with('success', __('Appointment selected. Please fill in the accident details.'));
+    }
+
+    /**
+     * Step 2: Accident form (accident number, plate, images).
+     */
+    public function index(Request $request): View|RedirectResponse
+    {
+        if (! session()->has('customer_appointment_date')) {
+            return redirect()->route('customer.appointment')
+                ->with('error', __('Please select an appointment first.'));
+        }
+
+        return view('customer.form', [
+            'appointment_date' => session('customer_appointment_date'),
+            'appointment_slot' => session('customer_appointment_slot'),
+        ]);
+    }
+
+    /**
+     * Store case and redirect to payment (Step 3).
+     */
     public function store(Request $request): RedirectResponse
     {
+        if (! session()->has('customer_appointment_date')) {
+            return redirect()->route('customer.appointment')
+                ->with('error', __('Please select an appointment first.'));
+        }
+
         $validated = $request->validate([
             'accident_number' => 'required|string|max:100|unique:cases,accident_number',
             'plate_number' => 'required|string|max:20',
@@ -30,6 +75,8 @@ class CustomerController extends Controller
         $case = DamageCase::create([
             'accident_number' => $validated['accident_number'],
             'plate_number' => $validated['plate_number'],
+            'appointment_date' => session('customer_appointment_date'),
+            'appointment_slot' => session('customer_appointment_slot'),
             'status' => DamageCase::STATUS_SUBMITTED,
         ]);
 
@@ -40,6 +87,8 @@ class CustomerController extends Controller
                 'path' => $path,
             ]);
         }
+
+        session()->forget(['customer_appointment_date', 'customer_appointment_slot']);
 
         return redirect()->route('payment.show', $case)
             ->with('success', 'Case submitted successfully. Please pay the service fee.');

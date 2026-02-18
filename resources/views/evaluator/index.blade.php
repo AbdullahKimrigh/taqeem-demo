@@ -18,6 +18,7 @@
             <tr>
                 <th class="px-4 py-3 font-medium text-slate-700">{{ __('Accident #') }}</th>
                 <th class="px-4 py-3 font-medium text-slate-700">{{ __('Plate') }}</th>
+                <th class="px-4 py-3 font-medium text-slate-700">{{ __('Appointment') }}</th>
                 <th class="px-4 py-3 font-medium text-slate-700">{{ __('Status') }}</th>
                 <th class="px-4 py-3 font-medium text-slate-700">{{ __('Created') }}</th>
                 <th class="px-4 py-3 font-medium text-slate-700">{{ __('Action') }}</th>
@@ -28,6 +29,13 @@
                 <tr class="border-t border-slate-200 hover:bg-slate-50">
                     <td class="px-4 py-3">{{ $c->accident_number }}</td>
                     <td class="px-4 py-3">{{ $c->plate_number }}</td>
+                    <td class="px-4 py-3 text-slate-600">
+                        @if($c->appointment_date && $c->appointment_slot)
+                            {{ $c->appointment_date->format('Y-m-d') }} — {{ $c->appointment_slot }}
+                        @else
+                            —
+                        @endif
+                    </td>
                     <td class="px-4 py-3">
                         @php
                             $badge = match($c->status) {
@@ -53,7 +61,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-4 py-8 text-center text-slate-500">{{ __('No cases found.') }}</td>
+                    <td colspan="6" class="px-4 py-8 text-center text-slate-500">{{ __('No cases found.') }}</td>
                 </tr>
             @endforelse
         </tbody>

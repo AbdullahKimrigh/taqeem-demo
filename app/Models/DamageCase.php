@@ -12,6 +12,8 @@ class DamageCase extends Model
     protected $fillable = [
         'accident_number',
         'plate_number',
+        'appointment_date',
+        'appointment_slot',
         'status',
         'service_fee_paid',
         'ai_result',
@@ -22,6 +24,7 @@ class DamageCase extends Model
 
     protected $casts = [
         'service_fee_paid' => 'boolean',
+        'appointment_date' => 'date',
         'ai_result' => 'array',
         'final_result' => 'array',
     ];

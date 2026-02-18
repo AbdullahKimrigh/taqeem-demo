@@ -43,16 +43,23 @@ class EvaluatorController extends Controller
     {
         $case->load('images');
 
-        if ($request->filled('notes')) {
-            $case->update(['notes' => $request->notes]);
-        }
+        $case->update(['notes' => $request->input('notes', '')]);
 
-        if ($request->filled('damages')) {
-            $damages = is_array($request->damages) ? $request->damages : json_decode($request->damages, true);
-            $total = 0;
-            foreach ($damages as $d) {
-                $total += (float) ($d['cost'] ?? 0);
+        if ($request->filled('damages') && is_array($request->damages)) {
+            $damages = [];
+            foreach ($request->damages as $d) {
+                $part = trim((string) ($d['part'] ?? ''));
+                $action = trim((string) ($d['action'] ?? ''));
+                $cost = (float) ($d['cost'] ?? 0);
+                if ($part !== '' || $action !== '' || $cost > 0) {
+                    $damages[] = [
+                        'part' => $part ?: '-',
+                        'action' => $action ?: '-',
+                        'cost' => (int) round($cost),
+                    ];
+                }
             }
+            $total = array_sum(array_column($damages, 'cost'));
             $current = $case->final_result ?? $case->ai_result ?? [];
             $case->update([
                 'final_result' => array_merge($current, [
@@ -82,19 +89,26 @@ class EvaluatorController extends Controller
                     'final_result' => $case->final_result ?? $case->ai_result,
                 ]);
                 return redirect()->route('report.show', $case)
-                    ->with('success', 'Case approved. Report generated.');
+                    ->with('success', 'Case approved. Report generated.')
+                    ->with('action_popup', __('The evaluation report was issued and sent to the customer.'));
 
             case 'more_images':
                 $case->update(['status' => DamageCase::STATUS_NEEDS_IMAGES]);
-                return redirect()->route('evaluator.index')->with('success', 'Case set to Needs More Images.');
+                return redirect()->route('evaluator.index')
+                    ->with('success', 'Case set to Needs More Images.')
+                    ->with('action_popup', __('The link for uploading more pictures was sent to the customer.'));
 
             case 'escalate':
                 $case->update(['status' => DamageCase::STATUS_ESCALATED]);
-                return redirect()->route('evaluator.index')->with('success', 'Case escalated to senior.');
+                return redirect()->route('evaluator.index')
+                    ->with('success', 'Case escalated to senior.')
+                    ->with('action_popup', __('The senior was notified!'));
 
             case 'physical':
                 $case->update(['status' => DamageCase::STATUS_PHYSICAL_VISIT]);
-                return redirect()->route('evaluator.index')->with('success', 'Case set to Require Physical Visit.');
+                return redirect()->route('evaluator.index')
+                    ->with('success', 'Case set to Require Physical Visit.')
+                    ->with('action_popup', __('The customer was notified to physically visit the center based on their selected appointment.'));
         }
 
         return redirect()->back();

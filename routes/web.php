@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('/customer/appointment', [CustomerController::class, 'appointment'])->name('customer.appointment');
+Route::post('/customer/appointment', [CustomerController::class, 'storeAppointment'])->name('customer.store-appointment');
 Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
 Route::post('/customer', [CustomerController::class, 'store'])->name('customer.store');
 

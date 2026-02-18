@@ -4,7 +4,11 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold text-slate-800 mb-6">{{ __('Submit Accident Report') }}</h1>
+    <p class="text-slate-500 text-sm mb-2">{{ __('Step') }} 2 {{ __('of') }} 3</p>
+    <h1 class="text-2xl font-bold text-slate-800 mb-2">{{ __('Submit Accident Report') }}</h1>
+    @if(isset($appointment_date) && isset($appointment_slot))
+        <p class="text-slate-600 text-sm mb-6">{{ __('Your appointment') }}: {{ $appointment_date }} — {{ $appointment_slot }}</p>
+    @endif
 
     <form action="{{ route('customer.store') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
         @csrf
@@ -45,7 +49,7 @@
             <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-700">
                 {{ __('Submit Case') }}
             </button>
-            <a href="{{ route('home') }}" class="px-4 py-2 border border-slate-300 rounded text-slate-700 hover:bg-slate-50">{{ __('Cancel') }}</a>
+            <a href="{{ route('customer.appointment') }}" class="px-4 py-2 border border-slate-300 rounded text-slate-700 hover:bg-slate-50">{{ __('Back') }}</a>
         </div>
     </form>
 </div>
